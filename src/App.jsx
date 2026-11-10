@@ -7,19 +7,22 @@ import {
   Save, Upload, Maximize, PanelBottom, Type
 } from 'lucide-react';
 
-// --- BUILT-IN PREMIUM FONTS ---
+// --- BUILT-IN PREMIUM FONTS (Upgraded with Header Fonts) ---
 const fontOptions = {
   Arabic: [
-    { name: 'Scheherazade New (Best for Madrasah)', value: "'Scheherazade New', serif" },
+    { name: 'Cairo (Modern Bold Header)', value: "'Cairo', sans-serif" },
+    { name: 'Aref Ruqaa (Calligraphy Header)', value: "'Aref Ruqaa', serif" },
+    { name: 'Scheherazade New (Best for Body)', value: "'Scheherazade New', serif" },
     { name: 'Amiri (Classic Print)', value: "'Amiri', serif" },
-    { name: 'Noto Naskh Arabic (Modern)', value: "'Noto Naskh Arabic', serif" }
+    { name: 'Noto Naskh Arabic (Standard)', value: "'Noto Naskh Arabic', serif" }
   ],
   Bangla: [
+    { name: 'Noto Sans Bengali (Bold & Clean)', value: "'Noto Sans Bengali', sans-serif" },
     { name: 'Tiro Bangla (Traditional Print)', value: "'Tiro Bangla', serif" },
-    { name: 'Noto Sans Bengali (Clean)', value: "'Noto Sans Bengali', sans-serif" },
     { name: 'Hind Siliguri (Modern)', value: "'Hind Siliguri', sans-serif" }
   ],
   English: [
+    { name: 'Playfair Display (Premium Header)', value: "'Playfair Display', serif" },
     { name: 'PT Serif (Classic Exam)', value: "'PT Serif', serif" },
     { name: 'Inter (Clean & Modern)', value: "'Inter', sans-serif" },
     { name: 'Roboto (Standard)', value: "'Roboto', sans-serif" }
@@ -28,7 +31,11 @@ const fontOptions = {
 
 export default function App() {
   const [language, setLanguage] = useState('Arabic');
-  const [selectedFont, setSelectedFont] = useState(fontOptions['Arabic'][0].value); // New state for dynamic font
+  
+  // NEW: Dual Font State
+  const [headerFont, setHeaderFont] = useState("'Cairo', sans-serif");
+  const [bodyFont, setBodyFont] = useState("'Scheherazade New', serif");
+
   const [paperSize, setPaperSize] = useState('A4');
   const [layoutStyle, setLayoutStyle] = useState('standard');
   const [fontSize, setFontSize] = useState(18);
@@ -59,9 +66,18 @@ export default function App() {
 
   const isRTL = language === 'Arabic';
   
-  // Update Font List when Language Changes
+  // Smart Default Fonts based on Language
   useEffect(() => {
-    setSelectedFont(fontOptions[language][0].value);
+    if (language === 'Arabic') {
+      setHeaderFont("'Cairo', sans-serif"); // Heavy, professional for header
+      setBodyFont("'Scheherazade New', serif"); // Easy to read with harkat
+    } else if (language === 'Bangla') {
+      setHeaderFont("'Noto Sans Bengali', sans-serif");
+      setBodyFont("'Tiro Bangla', serif");
+    } else {
+      setHeaderFont("'Playfair Display', serif");
+      setBodyFont("'PT Serif', serif");
+    }
   }, [language]);
 
   const getPaperDimensions = () => {
@@ -84,7 +100,7 @@ export default function App() {
 
   const saveTemplate = () => {
     const templateData = {
-      language, selectedFont, paperSize, layoutStyle, fontSize, showWatermark, watermarkText,
+      language, headerFont, bodyFont, paperSize, layoutStyle, fontSize, showWatermark, watermarkText,
       schoolName, examTitle, classLevel, subject, totalMarks, examTime, text, logo,
       marginTop, marginBottom, marginLeft, marginRight, showFooter, footerText
     };
@@ -103,9 +119,15 @@ export default function App() {
         try {
           const data = JSON.parse(event.target.result);
           if(data.language) setLanguage(data.language);
-          // Small timeout ensures language state updates before font state
+          
           setTimeout(() => {
-            if(data.selectedFont) setSelectedFont(data.selectedFont);
+            if(data.headerFont) setHeaderFont(data.headerFont);
+            if(data.bodyFont) setBodyFont(data.bodyFont);
+            // Backward compatibility for older templates
+            if(data.selectedFont && !data.headerFont) {
+              setHeaderFont(data.selectedFont);
+              setBodyFont(data.selectedFont);
+            }
           }, 50);
           
           if(data.paperSize) setPaperSize(data.paperSize);
@@ -170,7 +192,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Global Settings (Language, Paper, Font Family) */}
+        {/* Global Settings */}
         <div className="grid grid-cols-2 gap-3 shrink-0">
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-slate-400">Language</label>
@@ -189,19 +211,43 @@ export default function App() {
           </div>
         </div>
 
-        {/* Dynamic Font Style & Size */}
-        <div className="grid grid-cols-2 gap-3 shrink-0 bg-black/20 p-3 rounded-xl border border-white/5">
-          <div className="space-y-2 flex flex-col justify-center">
-            <label className="flex items-center gap-2 text-xs font-medium text-slate-400">
-              <Type size={14}/> Font Style
+        {/* --- NEW: DUAL FONT SELECTORS --- */}
+        <div className="bg-black/20 p-4 rounded-xl border border-white/5 shrink-0 space-y-3">
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-400">
+            <Type size={14} className="text-amber-400"/> Typography Setup
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-400 uppercase tracking-wider">Header Font</label>
+              <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white outline-none focus:border-amber-500/50" value={headerFont} onChange={(e) => setHeaderFont(e.target.value)}>
+                {fontOptions[language].map((font, idx) => (
+                  <option key={`hf-${idx}`} value={font.value}>{font.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-400 uppercase tracking-wider">Body Font</label>
+              <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white outline-none focus:border-amber-500/50" value={bodyFont} onChange={(e) => setBodyFont(e.target.value)}>
+                {fontOptions[language].map((font, idx) => (
+                  <option key={`bf-${idx}`} value={font.value}>{font.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Layout & Font Size */}
+        <div className="grid grid-cols-2 gap-3 shrink-0">
+          <div className="space-y-1.5 bg-black/20 p-3 rounded-xl border border-white/5">
+            <label className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2">
+              <Columns size={14}/> Layout Style
             </label>
-            <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-xs text-white outline-none focus:border-blue-500/50 transition-all" value={selectedFont} onChange={(e) => setSelectedFont(e.target.value)}>
-              {fontOptions[language].map((font, idx) => (
-                <option key={idx} value={font.value}>{font.name}</option>
-              ))}
+            <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50 transition-all" value={layoutStyle} onChange={(e) => setLayoutStyle(e.target.value)}>
+              <option value="standard">Standard (1 Column)</option>
+              <option value="mcq">MCQ / 2 Columns</option>
             </select>
           </div>
-          <div className="space-y-1.5 flex flex-col justify-center">
+          <div className="space-y-1.5 bg-black/20 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
             <label className="flex items-center justify-between text-xs font-medium text-slate-400">
               <span>Font Size: <strong className="text-white">{fontSize}px</strong></span>
             </label>
@@ -211,31 +257,12 @@ export default function App() {
 
         {/* Custom Margin Settings */}
         <div className="bg-black/40 p-4 rounded-xl border border-white/10 shrink-0">
-          <div className="flex items-center justify-between mb-3">
-             <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Maximize size={16} className="text-emerald-400"/> Margins (mm)</h2>
-             
-             {/* Layout Style Toggle */}
-             <select className="bg-black/40 border border-white/10 rounded-lg p-1.5 text-xs text-white outline-none" value={layoutStyle} onChange={(e) => setLayoutStyle(e.target.value)}>
-                <option value="standard">1 Column</option>
-                <option value="mcq">2 Columns (MCQ)</option>
-             </select>
-          </div>
+          <h2 className="text-sm font-semibold text-white flex items-center gap-2 mb-3"><Maximize size={16} className="text-emerald-400"/> Margins (mm)</h2>
           <div className="grid grid-cols-4 gap-3">
             {['Top', 'Bottom', 'Left', 'Right'].map((pos) => (
               <div key={pos}>
                 <label className="text-[10px] text-slate-400 block text-center mb-1 uppercase tracking-wider">{pos}</label>
-                <input 
-                  type="number" 
-                  value={pos === 'Top' ? marginTop : pos === 'Bottom' ? marginBottom : pos === 'Left' ? marginLeft : marginRight} 
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    if(pos === 'Top') setMarginTop(val);
-                    if(pos === 'Bottom') setMarginBottom(val);
-                    if(pos === 'Left') setMarginLeft(val);
-                    if(pos === 'Right') setMarginRight(val);
-                  }} 
-                  className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-center text-white outline-none focus:border-emerald-500/50" 
-                />
+                <input type="number" value={pos === 'Top' ? marginTop : pos === 'Bottom' ? marginBottom : pos === 'Left' ? marginLeft : marginRight} onChange={(e) => { const val = Number(e.target.value); if(pos === 'Top') setMarginTop(val); if(pos === 'Bottom') setMarginBottom(val); if(pos === 'Left') setMarginLeft(val); if(pos === 'Right') setMarginRight(val); }} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-center text-white outline-none focus:border-emerald-500/50" />
               </div>
             ))}
           </div>
@@ -263,7 +290,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Footer & Watermark Compact Modules */}
+        {/* Footer & Watermark */}
         <div className="grid grid-cols-2 gap-3 shrink-0">
            <div className="bg-black/40 p-3 rounded-xl border border-white/10 flex flex-col justify-center space-y-3">
               <div className="flex items-center justify-between">
@@ -291,14 +318,8 @@ export default function App() {
              <BookOpen size={16} className="text-blue-400"/>
              <span className="text-sm font-semibold">Questions Editor</span>
           </div>
-          <div className="flex-1" dir={isRTL ? "rtl" : "ltr"} style={{ fontFamily: selectedFont }}>
-            <ReactQuill 
-              theme="snow" 
-              value={text} 
-              onChange={setText} 
-              modules={modules}
-              className="h-[200px] text-black"
-            />
+          <div className="flex-1" dir={isRTL ? "rtl" : "ltr"} style={{ fontFamily: bodyFont }}>
+            <ReactQuill theme="snow" value={text} onChange={setText} modules={modules} className="h-[200px] text-black" />
           </div>
         </div>
 
@@ -319,17 +340,19 @@ export default function App() {
             paddingRight: `${marginRight}mm` 
           }}
         >
+          {/* Watermark uses Header Font for grand look */}
           {showWatermark && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-10">
-              <div className="transform -rotate-45 font-bold whitespace-nowrap" style={{ fontSize: '100px', fontFamily: selectedFont, color: 'black' }}>
+              <div className="transform -rotate-45 font-bold whitespace-nowrap" style={{ fontSize: '100px', fontFamily: headerFont, color: 'black' }}>
                 {watermarkText}
               </div>
             </div>
           )}
 
-          <div className="relative z-10" dir={isRTL ? "rtl" : "ltr"} style={{ fontFamily: selectedFont, color: 'black' }}>
+          <div className="relative z-10" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
-            <div className="relative text-center border-b-[3px] border-black pb-4 mb-6">
+            {/* Header Section (Uses Header Font) */}
+            <div className="relative text-center border-b-[3px] border-black pb-4 mb-6" style={{ fontFamily: headerFont }}>
               {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
               <h1 className="font-bold mb-1 leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 100px' : '0' }}>{schoolName}</h1>
               <h2 className="font-semibold mb-2" style={{ fontSize: `${fontSize * 1.2}px` }}>{examTitle}</h2>
@@ -337,15 +360,17 @@ export default function App() {
                 <span>{isRTL ? 'الصف: ' : 'Class: '}{classLevel}</span>
                 <span>{isRTL ? 'المادة: ' : 'Subject: '}{subject}</span>
               </div>
-              <div className="flex justify-between items-center font-medium mt-1" style={{ fontSize: `${fontSize * 0.9}px` }}>
+              <div className="flex justify-between items-center font-bold mt-1" style={{ fontSize: `${fontSize * 0.9}px` }}>
                 <span>{isRTL ? 'الوقت: ' : 'Time: '}{examTime}</span>
                 <span>{isRTL ? 'الدرجة: ' : 'Marks: '}{totalMarks}</span>
               </div>
             </div>
 
+            {/* Main Content Section (Uses Body Font) */}
             <div 
               className="break-inside-avoid [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mr-6 [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mr-6 [&>p]:mb-2"
               style={{ 
+                fontFamily: bodyFont,
                 fontSize: `${fontSize}px`,
                 lineHeight: '2.0',      
                 textAlign: 'justify',
@@ -356,11 +381,12 @@ export default function App() {
             />
           </div>
 
+          {/* Footer Section (Uses Body Font) */}
           {showFooter && (
             <div 
               className="hidden print:block fixed bottom-0 left-0 w-full text-center border-t border-black pt-2 pb-2 bg-white z-50"
               style={{ 
-                fontFamily: selectedFont, 
+                fontFamily: bodyFont, 
                 fontSize: `${fontSize * 0.8}px`,
                 color: 'black'
               }}
