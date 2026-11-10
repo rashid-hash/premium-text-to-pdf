@@ -4,10 +4,9 @@ import 'react-quill-new/dist/quill.snow.css';
 import { 
   Download, LayoutTemplate, Building2, BookOpen, 
   ToggleLeft, ToggleRight, Fingerprint, ImagePlus, Trash2, Columns,
-  Save, Upload, Maximize, PanelBottom, Type
-} from 'lucide-react';
+  Save, Upload, Maximize, PanelBottom, Type 
+} from 'lucide-react'; // Removed 'Github' to fix the crash
 
-// --- BUILT-IN PREMIUM FONTS (Upgraded with Header Fonts) ---
 const fontOptions = {
   Arabic: [
     { name: 'Cairo (Modern Bold Header)', value: "'Cairo', sans-serif" },
@@ -31,8 +30,6 @@ const fontOptions = {
 
 export default function App() {
   const [language, setLanguage] = useState('Arabic');
-  
-  // NEW: Dual Font State
   const [headerFont, setHeaderFont] = useState("'Cairo', sans-serif");
   const [bodyFont, setBodyFont] = useState("'Scheherazade New', serif");
 
@@ -66,11 +63,10 @@ export default function App() {
 
   const isRTL = language === 'Arabic';
   
-  // Smart Default Fonts based on Language
   useEffect(() => {
     if (language === 'Arabic') {
-      setHeaderFont("'Cairo', sans-serif"); // Heavy, professional for header
-      setBodyFont("'Scheherazade New', serif"); // Easy to read with harkat
+      setHeaderFont("'Cairo', sans-serif");
+      setBodyFont("'Scheherazade New', serif");
     } else if (language === 'Bangla') {
       setHeaderFont("'Noto Sans Bengali', sans-serif");
       setBodyFont("'Tiro Bangla', serif");
@@ -123,7 +119,6 @@ export default function App() {
           setTimeout(() => {
             if(data.headerFont) setHeaderFont(data.headerFont);
             if(data.bodyFont) setBodyFont(data.bodyFont);
-            // Backward compatibility for older templates
             if(data.selectedFont && !data.headerFont) {
               setHeaderFont(data.selectedFont);
               setBodyFont(data.selectedFont);
@@ -211,7 +206,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* --- NEW: DUAL FONT SELECTORS --- */}
+        {/* DUAL FONT SELECTORS */}
         <div className="bg-black/20 p-4 rounded-xl border border-white/5 shrink-0 space-y-3">
           <label className="flex items-center gap-2 text-xs font-medium text-slate-400">
             <Type size={14} className="text-amber-400"/> Typography Setup
@@ -326,6 +321,34 @@ export default function App() {
         <button onClick={handleGeneratePDF} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3.5 rounded-xl flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] shrink-0 transition-all mt-4">
           <Download size={20} /> Download PDF
         </button>
+
+        {/* --- Developer Signature Footer --- */}
+        <div className="mt-8 pt-5 border-t border-white/5 text-center flex flex-col items-center gap-1.5 shrink-0 pb-4">
+          <p className="text-[8px] text-slate-500 uppercase tracking-[0.3em]">Crafted with ❤️ by</p>
+          <h3 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 tracking-wider">
+            A. Rashid
+          </h3>
+          <p className="text-[10px] text-slate-400 font-medium">
+            Full-Stack Web Developer (React, Next.js, Node.js)
+          </p>
+          
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <a 
+              href="https://github.com/rashid-hash" 
+              target="_blank" 
+              rel="noreferrer" 
+              className="flex items-center gap-1.5 text-[10px] text-slate-500 border border-white/10 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition-all"
+            >
+              {/* Native SVG for GitHub Icon - Bulletproof against missing package exports */}
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                <path d="M9 18c-4.51 2-5-2-7-2"></path>
+              </svg>
+              <span>@rashid-hash</span>
+            </a>
+          </div>
+        </div>
+
       </div>
 
       {/* Live Preview Workspace */}
@@ -340,7 +363,6 @@ export default function App() {
             paddingRight: `${marginRight}mm` 
           }}
         >
-          {/* Watermark uses Header Font for grand look */}
           {showWatermark && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-10">
               <div className="transform -rotate-45 font-bold whitespace-nowrap" style={{ fontSize: '100px', fontFamily: headerFont, color: 'black' }}>
