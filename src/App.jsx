@@ -4,7 +4,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import { 
   Download, LayoutTemplate, Building2, BookOpen, 
   ToggleLeft, ToggleRight, Fingerprint, ImagePlus, Trash2, Columns,
-  Save, Upload, Maximize, PanelBottom, Type 
+  Save, Upload, PanelBottom, Type 
 } from 'lucide-react';
 
 const fontOptions = {
@@ -37,11 +37,6 @@ export default function App() {
   const [layoutStyle, setLayoutStyle] = useState('standard');
   const [fontSize, setFontSize] = useState(18);
   const [lineSpacing, setLineSpacing] = useState(1.6);
-
-  const [marginTop, setMarginTop] = useState(20);
-  const [marginBottom, setMarginBottom] = useState(20);
-  const [marginLeft, setMarginLeft] = useState(20);
-  const [marginRight, setMarginRight] = useState(20);
 
   const [logo, setLogo] = useState(null);
   const fileInputRef = useRef(null);
@@ -98,8 +93,7 @@ export default function App() {
   const saveTemplate = () => {
     const templateData = {
       language, headerFont, bodyFont, paperSize, layoutStyle, fontSize, lineSpacing, showWatermark, watermarkText,
-      schoolName, examTitle, classLevel, subject, totalMarks, examTime, text, logo,
-      marginTop, marginBottom, marginLeft, marginRight, showFooter, footerText
+      schoolName, examTitle, classLevel, subject, totalMarks, examTime, text, logo, showFooter, footerText
     };
     const blob = new Blob([JSON.stringify(templateData)], { type: "application/json" });
     const link = document.createElement("a");
@@ -136,10 +130,6 @@ export default function App() {
           if(data.examTime) setExamTime(data.examTime);
           if(data.text) setText(data.text);
           if(data.logo) setLogo(data.logo);
-          if(data.marginTop !== undefined) setMarginTop(data.marginTop);
-          if(data.marginBottom !== undefined) setMarginBottom(data.marginBottom);
-          if(data.marginLeft !== undefined) setMarginLeft(data.marginLeft);
-          if(data.marginRight !== undefined) setMarginRight(data.marginRight);
           if(data.showFooter !== undefined) setShowFooter(data.showFooter);
           if(data.footerText) setFooterText(data.footerText);
         } catch (error) {
@@ -258,19 +248,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Custom Margin Settings */}
-        <div className="bg-black/40 p-4 rounded-xl border border-white/10 shrink-0">
-          <h2 className="text-sm font-semibold text-white flex items-center gap-2 mb-3"><Maximize size={16} className="text-emerald-400"/> Margins (mm)</h2>
-          <div className="grid grid-cols-4 gap-3">
-            {['Top', 'Bottom', 'Left', 'Right'].map((pos) => (
-              <div key={pos}>
-                <label className="text-[10px] text-slate-400 block text-center mb-1 uppercase tracking-wider">{pos}</label>
-                <input type="number" value={pos === 'Top' ? marginTop : pos === 'Bottom' ? marginBottom : pos === 'Left' ? marginLeft : marginRight} onChange={(e) => { const val = Number(e.target.value); if(pos === 'Top') setMarginTop(val); if(pos === 'Bottom') setMarginBottom(val); if(pos === 'Left') setMarginLeft(val); if(pos === 'Right') setMarginRight(val); }} className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-sm text-center text-white outline-none focus:border-emerald-500/50" />
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Header Details */}
         <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/10 shrink-0">
           <div className="flex items-center justify-between mb-2">
@@ -315,7 +292,7 @@ export default function App() {
            </div>
         </div>
 
-        {/* Rich Text Editor */}
+        {/* Rich Text Editor Module */}
         <div className="flex-1 flex flex-col space-y-2 min-h-[300px] shrink-0 bg-white rounded-xl overflow-hidden border border-white/10">
           <div className="bg-slate-800 p-3 flex items-center gap-2 text-white border-b border-white/10">
              <BookOpen size={16} className="text-blue-400"/>
@@ -358,11 +335,9 @@ export default function App() {
           className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all duration-300 relative overflow-hidden print:shadow-none print:w-full print:min-h-0 print:m-0"
           style={{ 
             ...getPaperDimensions(), 
-            boxSizing: 'border-box', // MAGICAL FIX 1: Keeps content strictly inside width bounds
-            paddingTop: `${marginTop}mm`, 
-            paddingBottom: `${marginBottom + (showFooter ? 20 : 0)}mm`, 
-            paddingLeft: `${marginLeft}mm`, 
-            paddingRight: `${marginRight}mm` 
+            boxSizing: 'border-box',
+            padding: '18mm', // Standard 18mm fixed padding for Top, Left, Right
+            paddingBottom: showFooter ? '38mm' : '18mm' // Added extra space for footer
           }}
         >
           {showWatermark && (
@@ -390,7 +365,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Main Content Section - MAGICAL FIX 2: Added break-words & whitespace-pre-wrap */}
+            {/* Main Content Section */}
             <div 
               className="w-full max-w-full break-words whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
               style={{ 
