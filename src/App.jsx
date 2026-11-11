@@ -36,7 +36,7 @@ export default function App() {
   const [paperSize, setPaperSize] = useState('A4');
   const [layoutStyle, setLayoutStyle] = useState('standard');
   const [fontSize, setFontSize] = useState(18);
-  const [lineSpacing, setLineSpacing] = useState(1.6); // NEW: Line Spacing State
+  const [lineSpacing, setLineSpacing] = useState(1.6);
 
   const [marginTop, setMarginTop] = useState(20);
   const [marginBottom, setMarginBottom] = useState(20);
@@ -120,10 +120,6 @@ export default function App() {
           setTimeout(() => {
             if(data.headerFont) setHeaderFont(data.headerFont);
             if(data.bodyFont) setBodyFont(data.bodyFont);
-            if(data.selectedFont && !data.headerFont) {
-              setHeaderFont(data.selectedFont);
-              setBodyFont(data.selectedFont);
-            }
           }, 50);
           
           if(data.paperSize) setPaperSize(data.paperSize);
@@ -233,7 +229,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Formatting Controls (Layout, Size, Spacing) */}
+        {/* Formatting Controls */}
         <div className="bg-black/20 p-4 rounded-xl border border-white/5 shrink-0 space-y-4">
           <div className="flex items-center justify-between gap-3">
              <div className="flex-1">
@@ -319,7 +315,7 @@ export default function App() {
            </div>
         </div>
 
-        {/* Rich Text Editor Module */}
+        {/* Rich Text Editor */}
         <div className="flex-1 flex flex-col space-y-2 min-h-[300px] shrink-0 bg-white rounded-xl overflow-hidden border border-white/10">
           <div className="bg-slate-800 p-3 flex items-center gap-2 text-white border-b border-white/10">
              <BookOpen size={16} className="text-blue-400"/>
@@ -343,14 +339,8 @@ export default function App() {
           <p className="text-[10px] text-slate-400 font-medium">
             Full-Stack Web Developer (React, Next.js, Node.js)
           </p>
-          
           <div className="flex items-center justify-center gap-3 mt-2">
-            <a 
-              href="https://github.com/rashid-hash" 
-              target="_blank" 
-              rel="noreferrer" 
-              className="flex items-center gap-1.5 text-[10px] text-slate-500 border border-white/10 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition-all"
-            >
+            <a href="https://github.com/rashid-hash" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] text-slate-500 border border-white/10 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
                 <path d="M9 18c-4.51 2-5-2-7-2"></path>
@@ -368,6 +358,7 @@ export default function App() {
           className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all duration-300 relative overflow-hidden print:shadow-none print:w-full print:min-h-0 print:m-0"
           style={{ 
             ...getPaperDimensions(), 
+            boxSizing: 'border-box', // MAGICAL FIX 1: Keeps content strictly inside width bounds
             paddingTop: `${marginTop}mm`, 
             paddingBottom: `${marginBottom + (showFooter ? 20 : 0)}mm`, 
             paddingLeft: `${marginLeft}mm`, 
@@ -382,9 +373,9 @@ export default function App() {
             </div>
           )}
 
-          <div className="relative z-10" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
+          <div className="relative z-10 w-full max-w-full" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
-            {/* Header Section (Uses Header Font) */}
+            {/* Header Section */}
             <div className="relative text-center border-b-[3px] border-black pb-4 mb-6" style={{ fontFamily: headerFont }}>
               {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
               <h1 className="font-bold mb-1 leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 100px' : '0' }}>{schoolName}</h1>
@@ -399,16 +390,18 @@ export default function App() {
               </div>
             </div>
 
-            {/* Main Content Section (Fixed Page Break Issue & Uses Custom Line Spacing) */}
+            {/* Main Content Section - MAGICAL FIX 2: Added break-words & whitespace-pre-wrap */}
             <div 
-              className="[&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mr-6 [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mr-6 [&>p]:mb-1"
+              className="w-full max-w-full break-words whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
               style={{ 
                 fontFamily: bodyFont,
                 fontSize: `${fontSize}px`,
-                lineHeight: lineSpacing, // Dynamic Line Spacing applied here     
+                lineHeight: lineSpacing,      
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
-                columnGap: '40px'
+                columnGap: '40px',
+                wordBreak: 'break-word',
+                overflowWrap: 'break-word'
               }}
               dangerouslySetInnerHTML={{ __html: text }}
             />
