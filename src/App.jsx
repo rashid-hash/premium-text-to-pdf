@@ -5,7 +5,7 @@ import {
   Download, LayoutTemplate, Building2, BookOpen, 
   ToggleLeft, ToggleRight, Fingerprint, ImagePlus, Trash2, Columns,
   Save, Upload, Maximize, PanelBottom, Type 
-} from 'lucide-react'; // Removed 'Github' to fix the crash
+} from 'lucide-react';
 
 const fontOptions = {
   Arabic: [
@@ -36,6 +36,7 @@ export default function App() {
   const [paperSize, setPaperSize] = useState('A4');
   const [layoutStyle, setLayoutStyle] = useState('standard');
   const [fontSize, setFontSize] = useState(18);
+  const [lineSpacing, setLineSpacing] = useState(1.6); // NEW: Line Spacing State
 
   const [marginTop, setMarginTop] = useState(20);
   const [marginBottom, setMarginBottom] = useState(20);
@@ -96,7 +97,7 @@ export default function App() {
 
   const saveTemplate = () => {
     const templateData = {
-      language, headerFont, bodyFont, paperSize, layoutStyle, fontSize, showWatermark, watermarkText,
+      language, headerFont, bodyFont, paperSize, layoutStyle, fontSize, lineSpacing, showWatermark, watermarkText,
       schoolName, examTitle, classLevel, subject, totalMarks, examTime, text, logo,
       marginTop, marginBottom, marginLeft, marginRight, showFooter, footerText
     };
@@ -128,6 +129,7 @@ export default function App() {
           if(data.paperSize) setPaperSize(data.paperSize);
           if(data.layoutStyle) setLayoutStyle(data.layoutStyle);
           if(data.fontSize) setFontSize(data.fontSize);
+          if(data.lineSpacing) setLineSpacing(data.lineSpacing);
           if(data.showWatermark !== undefined) setShowWatermark(data.showWatermark);
           if(data.watermarkText) setWatermarkText(data.watermarkText);
           if(data.schoolName) setSchoolName(data.schoolName);
@@ -231,22 +233,32 @@ export default function App() {
           </div>
         </div>
 
-        {/* Layout & Font Size */}
-        <div className="grid grid-cols-2 gap-3 shrink-0">
-          <div className="space-y-1.5 bg-black/20 p-3 rounded-xl border border-white/5">
-            <label className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2">
-              <Columns size={14}/> Layout Style
-            </label>
-            <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50 transition-all" value={layoutStyle} onChange={(e) => setLayoutStyle(e.target.value)}>
-              <option value="standard">Standard (1 Column)</option>
-              <option value="mcq">MCQ / 2 Columns</option>
-            </select>
+        {/* Formatting Controls (Layout, Size, Spacing) */}
+        <div className="bg-black/20 p-4 rounded-xl border border-white/5 shrink-0 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+             <div className="flex-1">
+                <label className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-2">
+                  <Columns size={14}/> Layout Style
+                </label>
+                <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50 transition-all" value={layoutStyle} onChange={(e) => setLayoutStyle(e.target.value)}>
+                  <option value="standard">Standard (1 Column)</option>
+                  <option value="mcq">MCQ (2 Columns)</option>
+                </select>
+             </div>
           </div>
-          <div className="space-y-1.5 bg-black/20 p-3 rounded-xl border border-white/5 flex flex-col justify-center">
-            <label className="flex items-center justify-between text-xs font-medium text-slate-400">
-              <span>Font Size: <strong className="text-white">{fontSize}px</strong></span>
-            </label>
-            <input type="range" min="12" max="36" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-blue-500 mt-2" />
+          <div className="grid grid-cols-2 gap-4">
+             <div>
+                <label className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                  <span>Font Size</span> <strong className="text-white">{fontSize}px</strong>
+                </label>
+                <input type="range" min="12" max="36" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-blue-500" />
+             </div>
+             <div>
+                <label className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                  <span>Line Spacing</span> <strong className="text-white">{lineSpacing}</strong>
+                </label>
+                <input type="range" min="1.0" max="3.0" step="0.1" value={lineSpacing} onChange={(e) => setLineSpacing(Number(e.target.value))} className="w-full accent-emerald-500" />
+             </div>
           </div>
         </div>
 
@@ -339,7 +351,6 @@ export default function App() {
               rel="noreferrer" 
               className="flex items-center gap-1.5 text-[10px] text-slate-500 border border-white/10 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition-all"
             >
-              {/* Native SVG for GitHub Icon - Bulletproof against missing package exports */}
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
                 <path d="M9 18c-4.51 2-5-2-7-2"></path>
@@ -388,13 +399,13 @@ export default function App() {
               </div>
             </div>
 
-            {/* Main Content Section (Uses Body Font) */}
+            {/* Main Content Section (Fixed Page Break Issue & Uses Custom Line Spacing) */}
             <div 
-              className="break-inside-avoid [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mr-6 [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mr-6 [&>p]:mb-2"
+              className="[&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mr-6 [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mr-6 [&>p]:mb-1"
               style={{ 
                 fontFamily: bodyFont,
                 fontSize: `${fontSize}px`,
-                lineHeight: '2.0',      
+                lineHeight: lineSpacing, // Dynamic Line Spacing applied here     
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
                 columnGap: '40px'
@@ -403,7 +414,7 @@ export default function App() {
             />
           </div>
 
-          {/* Footer Section (Uses Body Font) */}
+          {/* Footer Section */}
           {showFooter && (
             <div 
               className="hidden print:block fixed bottom-0 left-0 w-full text-center border-t border-black pt-2 pb-2 bg-white z-50"
