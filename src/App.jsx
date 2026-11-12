@@ -49,16 +49,16 @@ export default function App() {
   const [footerText, setFooterText] = useState('مَدْرَسَةُ الأَقْصَى النَّمُوذَجِيَّةُ - ٢٠٢٦');
 
   // ENHANCED HEADER STATE
-  const [schoolName, setSchoolName] = useState('مَدْرَسَةُ الأَقْصَى النَّمُوذَجِيَّةُ');
-  const [schoolAddress, setSchoolAddress] = useState('هَلْدِبَارِي، كَاوْنِيَا، رَنْغَبُور'); // New Address Line
-  const [examTitle, setExamTitle] = useState('الاِمْتِحَانُ السَّنَوِيُّ/ ٢٠٢٦ م');
+  const [schoolName, setSchoolName] = useState('');
+  const [schoolAddress, setSchoolAddress] = useState(''); // New Address Line
+  const [examTitle, setExamTitle] = useState('');
   
-  const [classLevel, setClassLevel] = useState('الصَّفُّ الْخَامِسْ');
-  const [subject, setSubject] = useState('الدُّرُوْسُ الْعَرَبِيَّةُ');
-  const [totalMarks, setTotalMarks] = useState('١٠٠');
-  const [examTime, setExamTime] = useState('٣ سَاعَات');
+  const [classLevel, setClassLevel] = useState('');
+  const [subject, setSubject] = useState('');
+  const [totalMarks, setTotalMarks] = useState('');
+  const [examTime, setExamTime] = useState('');
 
-  const [text, setText] = useState('<p>١. اَجِبْ عَشَرَةَ مَعَانِي الْكَلِمَاتِ التَالِيَة</p><p><strong>اَرْكَانٌ ، اِسْتَطَاعَ ، إقَامَةٌ ، نُورُ عُمْرِيْ</strong></p><br><p>٢. تَرْجِمْ أَحَدَ النَّصَّيْنِ الْآتِيَيْنِ</p><p>اَلْأَقْصٰىْ هُوَ أَوَّلُ قِبْلَةٍ صَلَّى نَحْوَهَا النَّبِيِّ...</p>');
+  const [text, setText] = useState('<p> </p><p><strong> </strong></p><br><p> </p><p> </p>');
 
   const isRTL = language === 'Arabic';
   
@@ -269,7 +269,7 @@ export default function App() {
           <input type="text" placeholder="Institution Name" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
           
           {/* New Address Field */}
-          <input type="text" placeholder="Address / Location (e.g. হলদিবাড়ি, কাউনিয়া)" value={schoolAddress} onChange={(e) => setSchoolAddress(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
+          <input type="text" placeholder="Address / Location" value={schoolAddress} onChange={(e) => setSchoolAddress(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
           
           <input type="text" placeholder="Exam Title" value={examTitle} onChange={(e) => setExamTitle(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
           
@@ -386,14 +386,14 @@ export default function App() {
 
               {/* Class & Subject */}
               <div className="flex justify-between items-center font-bold mt-2" style={{ fontSize: `${fontSize}px` }}>
-                <span>{isRTL ? 'الصف: ' : 'Class: '}{classLevel}</span>
-                <span>{isRTL ? 'المادة: ' : 'Subject: '}{subject}</span>
+                <span>{isRTL ? '' : ''}{classLevel}</span>
+                <span>{isRTL ? '' : ''}{subject}</span>
               </div>
               
               {/* Time & Marks */}
               <div className="flex justify-between items-center font-bold mt-1.5" style={{ fontSize: `${fontSize * 0.9}px` }}>
-                <span>{isRTL ? 'الوقت: ' : 'Time: '}{examTime}</span>
-                <span>{isRTL ? 'الدرجة: ' : 'Marks: '}{totalMarks}</span>
+                <span>{isRTL ? '' : ''}{examTime}</span>
+                <span>{isRTL ? '' : 'Marks: '}{totalMarks}</span>
               </div>
             </div>
 
