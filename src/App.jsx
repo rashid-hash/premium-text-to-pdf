@@ -48,8 +48,11 @@ export default function App() {
   const [showFooter, setShowFooter] = useState(true);
   const [footerText, setFooterText] = useState('مَدْرَسَةُ الأَقْصَى النَّمُوذَجِيَّةُ - ٢٠٢٦');
 
+  // ENHANCED HEADER STATE
   const [schoolName, setSchoolName] = useState('مَدْرَسَةُ الأَقْصَى النَّمُوذَجِيَّةُ');
-  const [examTitle, setExamTitle] = useState('الاِمْتِحَانُ السَّنَوِيُّ/ ٢٠٢٦ ه');
+  const [schoolAddress, setSchoolAddress] = useState('هَلْدِبَارِي، كَاوْنِيَا، رَنْغَبُور'); // New Address Line
+  const [examTitle, setExamTitle] = useState('الاِمْتِحَانُ السَّنَوِيُّ/ ٢٠٢٦ م');
+  
   const [classLevel, setClassLevel] = useState('الصَّفُّ الْخَامِسْ');
   const [subject, setSubject] = useState('الدُّرُوْسُ الْعَرَبِيَّةُ');
   const [totalMarks, setTotalMarks] = useState('١٠٠');
@@ -93,7 +96,7 @@ export default function App() {
   const saveTemplate = () => {
     const templateData = {
       language, headerFont, bodyFont, paperSize, layoutStyle, fontSize, lineSpacing, showWatermark, watermarkText,
-      schoolName, examTitle, classLevel, subject, totalMarks, examTime, text, logo, showFooter, footerText
+      schoolName, schoolAddress, examTitle, classLevel, subject, totalMarks, examTime, text, logo, showFooter, footerText
     };
     const blob = new Blob([JSON.stringify(templateData)], { type: "application/json" });
     const link = document.createElement("a");
@@ -122,12 +125,15 @@ export default function App() {
           if(data.lineSpacing) setLineSpacing(data.lineSpacing);
           if(data.showWatermark !== undefined) setShowWatermark(data.showWatermark);
           if(data.watermarkText) setWatermarkText(data.watermarkText);
+          
           if(data.schoolName) setSchoolName(data.schoolName);
+          if(data.schoolAddress !== undefined) setSchoolAddress(data.schoolAddress);
           if(data.examTitle) setExamTitle(data.examTitle);
           if(data.classLevel) setClassLevel(data.classLevel);
           if(data.subject) setSubject(data.subject);
           if(data.totalMarks) setTotalMarks(data.totalMarks);
           if(data.examTime) setExamTime(data.examTime);
+          
           if(data.text) setText(data.text);
           if(data.logo) setLogo(data.logo);
           if(data.showFooter !== undefined) setShowFooter(data.showFooter);
@@ -248,7 +254,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Header Details */}
+        {/* ENHANCED Header Details */}
         <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/10 shrink-0">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Building2 size={16} className="text-blue-400"/> Header Details</h2>
@@ -261,8 +267,13 @@ export default function App() {
             </div>
           </div>
           <input type="text" placeholder="Institution Name" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
+          
+          {/* New Address Field */}
+          <input type="text" placeholder="Address / Location (e.g. হলদিবাড়ি, কাউনিয়া)" value={schoolAddress} onChange={(e) => setSchoolAddress(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
+          
           <input type="text" placeholder="Exam Title" value={examTitle} onChange={(e) => setExamTitle(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
-          <div className="grid grid-cols-2 gap-3">
+          
+          <div className="grid grid-cols-2 gap-3 mt-2">
             <input type="text" placeholder="Class" value={classLevel} onChange={(e) => setClassLevel(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
             <input type="text" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
             <input type="text" placeholder="Total Marks" value={totalMarks} onChange={(e) => setTotalMarks(e.target.value)} dir={isRTL ? "rtl" : "ltr"} className="w-full bg-black/40 border border-white/10 rounded-lg p-2.5 text-sm text-white outline-none focus:border-blue-500/50" />
@@ -307,7 +318,7 @@ export default function App() {
           <Download size={20} /> Download PDF
         </button>
 
-        {/* --- Developer Signature Footer --- */}
+        {/* Developer Signature Footer */}
         <div className="mt-8 pt-5 border-t border-white/5 text-center flex flex-col items-center gap-1.5 shrink-0 pb-4">
           <p className="text-[8px] text-slate-500 uppercase tracking-[0.3em]">Crafted with ❤️ by</p>
           <h3 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 tracking-wider">
@@ -326,7 +337,6 @@ export default function App() {
             </a>
           </div>
         </div>
-
       </div>
 
       {/* Live Preview Workspace */}
@@ -336,8 +346,8 @@ export default function App() {
           style={{ 
             ...getPaperDimensions(), 
             boxSizing: 'border-box',
-            padding: '18mm', // Standard 18mm fixed padding for Top, Left, Right
-            paddingBottom: showFooter ? '38mm' : '18mm' // Added extra space for footer
+            padding: '18mm', 
+            paddingBottom: showFooter ? '38mm' : '18mm'
           }}
         >
           {showWatermark && (
@@ -350,16 +360,38 @@ export default function App() {
 
           <div className="relative z-10 w-full max-w-full" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
-            {/* Header Section */}
+            {/* UPDATED HEADER SECTION */}
             <div className="relative text-center border-b-[3px] border-black pb-4 mb-6" style={{ fontFamily: headerFont }}>
               {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
+              
+              {/* Institution Name */}
               <h1 className="font-bold mb-1 leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 100px' : '0' }}>{schoolName}</h1>
-              <h2 className="font-semibold mb-2" style={{ fontSize: `${fontSize * 1.2}px` }}>{examTitle}</h2>
-              <div className="flex justify-between items-center font-bold mt-4" style={{ fontSize: `${fontSize}px` }}>
+              
+              {/* NEW: Institution Address */}
+              {schoolAddress && (
+                <h2 className="font-semibold mb-3 leading-tight" style={{ fontSize: `${fontSize * 1.05}px` }}>{schoolAddress}</h2>
+              )}
+              
+              {/* NEW: Exam Title inside a Professional Box */}
+              {examTitle && (
+                <div className="mb-4">
+                  <span 
+                    className="inline-block border-[2.5px] border-black px-6 py-1.5 font-bold rounded-lg" 
+                    style={{ fontSize: `${fontSize * 1.15}px` }}
+                  >
+                    {examTitle}
+                  </span>
+                </div>
+              )}
+
+              {/* Class & Subject */}
+              <div className="flex justify-between items-center font-bold mt-2" style={{ fontSize: `${fontSize}px` }}>
                 <span>{isRTL ? 'الصف: ' : 'Class: '}{classLevel}</span>
                 <span>{isRTL ? 'المادة: ' : 'Subject: '}{subject}</span>
               </div>
-              <div className="flex justify-between items-center font-bold mt-1" style={{ fontSize: `${fontSize * 0.9}px` }}>
+              
+              {/* Time & Marks */}
+              <div className="flex justify-between items-center font-bold mt-1.5" style={{ fontSize: `${fontSize * 0.9}px` }}>
                 <span>{isRTL ? 'الوقت: ' : 'Time: '}{examTime}</span>
                 <span>{isRTL ? 'الدرجة: ' : 'Marks: '}{totalMarks}</span>
               </div>
