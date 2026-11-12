@@ -8,13 +8,6 @@ import {
 } from 'lucide-react';
 
 const fontOptions = {
-  Arabic: [
-    { name: 'Cairo (Modern Bold Header)', value: "'Cairo', sans-serif" },
-    { name: 'Aref Ruqaa (Calligraphy Header)', value: "'Aref Ruqaa', serif" },
-    { name: 'Scheherazade New (Best for Body)', value: "'Scheherazade New', serif" },
-    { name: 'Amiri (Classic Print)', value: "'Amiri', serif" },
-    { name: 'Noto Naskh Arabic (Standard)', value: "'Noto Naskh Arabic', serif" }
-  ],
   Bangla: [
     { name: 'Noto Sans Bengali (Bold & Clean)', value: "'Noto Sans Bengali', sans-serif" },
     { name: 'Tiro Bangla (Traditional Print)', value: "'Tiro Bangla', serif" },
@@ -25,21 +18,28 @@ const fontOptions = {
     { name: 'PT Serif (Classic Exam)', value: "'PT Serif', serif" },
     { name: 'Inter (Clean & Modern)', value: "'Inter', sans-serif" },
     { name: 'Roboto (Standard)', value: "'Roboto', sans-serif" }
+  ],
+  Arabic: [
+    { name: 'Cairo (Modern Bold Header)', value: "'Cairo', sans-serif" },
+    { name: 'Aref Ruqaa (Calligraphy Header)', value: "'Aref Ruqaa', serif" },
+    { name: 'Scheherazade New (Best for Body)', value: "'Scheherazade New', serif" },
+    { name: 'Amiri (Classic Print)', value: "'Amiri', serif" },
+    { name: 'Noto Naskh Arabic (Standard)', value: "'Noto Naskh Arabic', serif" }
   ]
 };
 
 export default function App() {
-  const [language, setLanguage] = useState('Arabic');
-  const [headerFont, setHeaderFont] = useState("'Cairo', sans-serif");
-  const [bodyFont, setBodyFont] = useState("'Scheherazade New', serif");
+  const [language, setLanguage] = useState('Bangla'); // Default Language Set to Bangla
+  const [headerFont, setHeaderFont] = useState("'Noto Sans Bengali', sans-serif");
+  const [bodyFont, setBodyFont] = useState("'Tiro Bangla', serif");
 
   const [paperSize, setPaperSize] = useState('A4');
-  const [orientation, setOrientation] = useState('portrait'); // NEW: Orientation State
+  const [orientation, setOrientation] = useState('portrait'); 
   const [layoutStyle, setLayoutStyle] = useState('standard');
   
   const [fontSize, setFontSize] = useState(18);
   const [lineSpacing, setLineSpacing] = useState(1.6);
-  const [headerLineSpacing, setHeaderLineSpacing] = useState(1.2); // NEW: Header Gap State
+  const [headerLineSpacing, setHeaderLineSpacing] = useState(1.2); 
 
   const [logo, setLogo] = useState(null);
   const fileInputRef = useRef(null);
@@ -66,19 +66,18 @@ export default function App() {
   const isRTL = language === 'Arabic';
   
   useEffect(() => {
-    if (language === 'Arabic') {
-      setHeaderFont("'Cairo', sans-serif");
-      setBodyFont("'Scheherazade New', serif");
-    } else if (language === 'Bangla') {
+    if (language === 'Bangla') {
       setHeaderFont("'Noto Sans Bengali', sans-serif");
       setBodyFont("'Tiro Bangla', serif");
-    } else {
+    } else if (language === 'English') {
       setHeaderFont("'Playfair Display', serif");
       setBodyFont("'PT Serif', serif");
+    } else {
+      setHeaderFont("'Cairo', sans-serif");
+      setBodyFont("'Scheherazade New', serif");
     }
   }, [language]);
 
-  // SMART PAPER DIMENSIONS (Handles Landscape/Portrait Auto Swap)
   const getPaperDimensions = () => {
     let w = '210mm';
     let h = '297mm';
@@ -173,7 +172,6 @@ export default function App() {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0a0f] to-black font-sans overflow-hidden print:bg-none print:bg-white print:block print:h-auto print:overflow-visible">
       
-      {/* Dynamic Print Orientation Style Injection */}
       <style>
         {`@media print {
             @page {
@@ -202,13 +200,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* Global Settings (Now 3 Columns for Orientation) */}
+        {/* Global Settings */}
         <div className="grid grid-cols-3 gap-3 shrink-0">
           <div className="space-y-1.5">
             <label className="text-[10px] uppercase tracking-wider font-medium text-slate-400">Language</label>
             <select className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs text-white outline-none focus:border-blue-500/50 transition-all" value={language} onChange={(e) => setLanguage(e.target.value)}>
-              <option value="English">English</option>
               <option value="Bangla">বাংলা</option>
+              <option value="English">English</option>
               <option value="Arabic">العربية</option>
             </select>
           </div>
@@ -253,7 +251,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Formatting Controls (Enhanced with Header Spacing) */}
+        {/* Formatting Controls */}
         <div className="bg-black/20 p-4 rounded-xl border border-white/5 shrink-0 space-y-4">
           <div className="flex items-center justify-between gap-3">
              <div className="flex-1">
@@ -350,6 +348,26 @@ export default function App() {
         <button onClick={handleGeneratePDF} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3.5 rounded-xl flex justify-center items-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] shrink-0 transition-all mt-4">
           <Download size={20} /> Download PDF
         </button>
+
+        {/* Developer Signature Footer */}
+        <div className="mt-8 pt-5 border-t border-white/5 text-center flex flex-col items-center gap-1.5 shrink-0 pb-4">
+          <p className="text-[8px] text-slate-500 uppercase tracking-[0.3em]">Crafted with ❤️ by</p>
+          <h3 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 tracking-wider">
+            A. Rashid
+          </h3>
+          <p className="text-[10px] text-slate-400 font-medium">
+            Full-Stack Web Developer (React, Next.js, Node.js)
+          </p>
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <a href="https://github.com/rashid-hash" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] text-slate-500 border border-white/10 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                <path d="M9 18c-4.51 2-5-2-7-2"></path>
+              </svg>
+              <span>@rashid-hash</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Live Preview Workspace */}
@@ -373,41 +391,47 @@ export default function App() {
 
           <div className="relative z-10 w-full max-w-full" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
-            {/* UPDATED HEADER SECTION (With Dynamic Line/Gap Spacing) */}
-            <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
-              {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
-              
-              {schoolName && (
-                <h1 className="font-bold leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 100px' : '0', marginBottom: `${headerLineSpacing * 2}px` }}>{schoolName}</h1>
-              )}
-              
-              {schoolAddress && (
-                <h2 className="font-semibold leading-tight" style={{ fontSize: `${fontSize * 1.05}px`, marginBottom: `${headerLineSpacing * 4}px` }}>{schoolAddress}</h2>
-              )}
-              
-              {examTitle && (
-                <div style={{ marginBottom: `${headerLineSpacing * 6}px`, marginTop: `${headerLineSpacing * 2}px` }}>
-                  <span 
-                    className="inline-block border-[2.5px] border-black px-6 py-1.5 font-bold rounded-lg" 
-                    style={{ fontSize: `${fontSize * 1.15}px` }}
-                  >
-                    {examTitle}
-                  </span>
+            {/* ========================================= */}
+            {/* FULL-WIDTH HEADER (For Bangla & English) */}
+            {/* ========================================= */}
+            {language !== 'Arabic' && (
+              <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
+                {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
+                
+                {schoolName && (
+                  <h1 className="font-bold leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 100px' : '0', marginBottom: `${headerLineSpacing * 2}px` }}>{schoolName}</h1>
+                )}
+                
+                {schoolAddress && (
+                  <h2 className="font-semibold leading-tight" style={{ fontSize: `${fontSize * 1.05}px`, marginBottom: `${headerLineSpacing * 4}px` }}>{schoolAddress}</h2>
+                )}
+                
+                {examTitle && (
+                  <div style={{ marginBottom: `${headerLineSpacing * 6}px`, marginTop: `${headerLineSpacing * 2}px` }}>
+                    <span 
+                      className="inline-block border-[2.5px] border-black px-6 py-1.5 font-bold rounded-lg" 
+                      style={{ fontSize: `${fontSize * 1.15}px` }}
+                    >
+                      {examTitle}
+                    </span>
+                  </div>
+                )}
+
+                <div className="w-full flex justify-between items-center font-bold mt-2" style={{ fontSize: `${fontSize}px` }}>
+                  <span>{classLevel}</span>
+                  <span>{subject}</span>
                 </div>
-              )}
-
-              <div className="w-full flex justify-between items-center font-bold mt-2" style={{ fontSize: `${fontSize}px` }}>
-                <span>{isRTL ? '' : ''}{classLevel}</span>
-                <span>{isRTL ? '' : ''}{subject}</span>
+                
+                <div className="w-full flex justify-between items-center font-bold mt-1.5" style={{ fontSize: `${fontSize * 0.9}px` }}>
+                  <span>{examTime}</span>
+                  <span>{totalMarks}</span>
+                </div>
               </div>
-              
-              <div className="w-full flex justify-between items-center font-bold mt-1.5" style={{ fontSize: `${fontSize * 0.9}px` }}>
-                <span>{isRTL ? '' : ''}{examTime}</span>
-                <span>{isRTL ? '' : ''}{totalMarks}</span>
-              </div>
-            </div>
+            )}
 
-            {/* Main Content Section */}
+            {/* ========================================= */}
+            {/* MAIN CONTENT & IN-COLUMN HEADER (For Arabic) */}
+            {/* ========================================= */}
             <div 
               className="w-full max-w-full break-words whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
               style={{ 
@@ -420,8 +444,45 @@ export default function App() {
                 wordBreak: 'break-word',
                 overflowWrap: 'break-word'
               }}
-              dangerouslySetInnerHTML={{ __html: text }}
-            />
+            >
+              
+              {/* BOOKLET STYLE HEADER (Renders inside the 1st Column only for Arabic) */}
+              {language === 'Arabic' && (
+                <div className="relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
+                  {logo && <img src={logo} alt="Logo" className={`absolute top-0 right-0 w-20 h-20 object-contain`} />}
+                  
+                  {schoolName && (
+                    <h1 className="font-bold leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 90px' : '0', marginBottom: `${headerLineSpacing * 2}px` }}>{schoolName}</h1>
+                  )}
+                  {schoolAddress && (
+                    <h2 className="font-semibold leading-tight" style={{ fontSize: `${fontSize * 1.05}px`, marginBottom: `${headerLineSpacing * 2}px` }}>{schoolAddress}</h2>
+                  )}
+                  {examTitle && (
+                    <h2 className="font-bold leading-tight" style={{ fontSize: `${fontSize * 1.15}px`, marginBottom: `${headerLineSpacing * 4}px` }}>{examTitle}</h2>
+                  )}
+
+                  {classLevel && (
+                    <div className="font-bold mt-1" style={{ fontSize: `${fontSize}px` }}>
+                      {classLevel}
+                    </div>
+                  )}
+                  {subject && (
+                    <div className="font-bold" style={{ fontSize: `${fontSize}px` }}>
+                      {subject}
+                    </div>
+                  )}
+                  
+                  <div className="w-full flex justify-between items-center font-bold mt-3" style={{ fontSize: `${fontSize * 0.9}px` }}>
+                    <span>{totalMarks}</span>
+                    <span>{examTime}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Text Editor Content */}
+              <div dangerouslySetInnerHTML={{ __html: text }} />
+            </div>
+
           </div>
 
           {/* Footer Section */}
