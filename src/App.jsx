@@ -29,7 +29,7 @@ const fontOptions = {
 };
 
 export default function App() {
-  const [language, setLanguage] = useState('Bangla'); // Default Language Set to Bangla
+  const [language, setLanguage] = useState('Bangla'); 
   const [headerFont, setHeaderFont] = useState("'Noto Sans Bengali', sans-serif");
   const [bodyFont, setBodyFont] = useState("'Tiro Bangla', serif");
 
@@ -51,7 +51,6 @@ export default function App() {
   const [showFooter, setShowFooter] = useState(true);
   const [footerText, setFooterText] = useState('');
 
-  // ENHANCED HEADER STATE (Kept Your Blank Customizations)
   const [schoolName, setSchoolName] = useState('');
   const [schoolAddress, setSchoolAddress] = useState(''); 
   const [examTitle, setExamTitle] = useState('');
@@ -433,16 +432,16 @@ export default function App() {
             {/* MAIN CONTENT & IN-COLUMN HEADER (For Arabic) */}
             {/* ========================================= */}
             <div 
-              className="w-full max-w-full break-words whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
+              className="w-full max-w-full whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
               style={{ 
                 fontFamily: bodyFont,
                 fontSize: `${fontSize}px`,
                 lineHeight: lineSpacing,      
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
-                columnGap: '40px',
-                wordBreak: 'break-word',
-                overflowWrap: 'break-word'
+                columnGap: '60px', /* MAGIC FIX: Increased gap from 40px to 60px for spacious reading */
+                wordBreak: 'normal', /* MAGIC FIX: Prevent Arabic words from breaking in middle */
+                overflowWrap: 'anywhere'
               }}
             >
               
