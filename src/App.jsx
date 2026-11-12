@@ -439,9 +439,12 @@ export default function App() {
                 lineHeight: lineSpacing,      
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
-                columnGap: '60px', /* MAGIC FIX: Increased gap from 40px to 60px for spacious reading */
-                wordBreak: 'normal', /* MAGIC FIX: Prevent Arabic words from breaking in middle */
-                overflowWrap: 'anywhere'
+                columnGap: '60px',
+                
+                /* MAGIC FIX 100% BULLETPROOF: Force Arabic words to stay whole and prevent cutting at edges */
+                wordBreak: 'keep-all',
+                overflowWrap: 'normal',
+                hyphens: 'none'
               }}
             >
               
