@@ -393,7 +393,7 @@ export default function App() {
               {/* Time & Marks */}
               <div className="flex justify-between items-center font-bold mt-1.5" style={{ fontSize: `${fontSize * 0.9}px` }}>
                 <span>{isRTL ? '' : ''}{examTime}</span>
-                <span>{isRTL ? '' : 'Marks: '}{totalMarks}</span>
+                <span>{isRTL ? '' : ''}{totalMarks}</span>
               </div>
             </div>
 
