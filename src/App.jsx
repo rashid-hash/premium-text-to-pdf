@@ -34,10 +34,10 @@ export default function App() {
   const [bodyFont, setBodyFont] = useState("'Tiro Bangla', serif");
 
   const [paperSize, setPaperSize] = useState('A4');
-  const [orientation, setOrientation] = useState('landscape'); // Changed default to landscape for booklet
-  const [layoutStyle, setLayoutStyle] = useState('mcq'); // Changed default to 2 columns
+  const [orientation, setOrientation] = useState('landscape'); 
+  const [layoutStyle, setLayoutStyle] = useState('mcq'); 
   
-  const [fontSize, setFontSize] = useState(16); // Changed default to 16px for booklet fitting
+  const [fontSize, setFontSize] = useState(16); 
   const [lineSpacing, setLineSpacing] = useState(1.6);
   const [headerLineSpacing, setHeaderLineSpacing] = useState(1.2); 
 
@@ -51,16 +51,17 @@ export default function App() {
   const [showFooter, setShowFooter] = useState(true);
   const [footerText, setFooterText] = useState('');
 
-  const [schoolName, setSchoolName] = useState('');
-  const [schoolAddress, setSchoolAddress] = useState(''); 
-  const [examTitle, setExamTitle] = useState('');
+  const [schoolName, setSchoolName] = useState('আল-আকসা আইডিয়াল মাদ্রাসা');
+  const [schoolAddress, setSchoolAddress] = useState('হলদিবাড়ি, কাউনিয়া, রংপুর'); 
+  const [examTitle, setExamTitle] = useState('বার্ষিক পরীক্ষা /২০২৬');
   
-  const [classLevel, setClassLevel] = useState('');
-  const [subject, setSubject] = useState('');
-  const [totalMarks, setTotalMarks] = useState('');
-  const [examTime, setExamTime] = useState('');
+  const [classLevel, setClassLevel] = useState('শ্রেণি: পঞ্চম');
+  const [subject, setSubject] = useState('বিষয়: কুরআন মাজিদ ও তাজভিদ');
+  const [totalMarks, setTotalMarks] = useState('পূর্ণমান: ১০০');
+  const [examTime, setExamTime] = useState('সময়: ২.৩০ মি:');
 
-  const [text, setText] = useState('<p> </p><p><strong> </strong></p><br><p> </p><p> </p>');
+  // Default Template configured perfectly for Booklets
+  const [text, setText] = useState(`<p><strong>১। এক কথায় উত্তর দাও (যেকোনো ১০ টি)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;১০</strong></p><ol style="list-style-type: lower-alpha;"><li>সর্বোত্তম নফল ইবাদাত কোনটি?</li><li>কুরআন তিলাওয়াতকারীর সাথে কিয়ামাতে কুরআন কেমন আচরণ করবে?</li><li>কুরআন মাজিদের আয়াত সংখ্যা কতটি?</li><li>কুরআন মাজিদের সবচেয়ে বড় আয়াত কোনটি?</li><li>কুরআন মাজিদের প্রথম নাজিলকৃত আয়াত কোনটি?</li></ol>`);
 
   const isRTL = language === 'Arabic';
   
@@ -80,13 +81,9 @@ export default function App() {
   const getPaperDimensions = () => {
     let w = '210mm';
     let h = '297mm';
-    
     if (paperSize === 'Letter') { w = '215.9mm'; h = '279.4mm'; }
     if (paperSize === 'Legal') { w = '215.9mm'; h = '355.6mm'; }
-    
-    if (orientation === 'landscape') {
-      return { width: h, minHeight: w };
-    }
+    if (orientation === 'landscape') return { width: h, minHeight: w };
     return { width: w, minHeight: h };
   };
 
@@ -119,12 +116,10 @@ export default function App() {
         try {
           const data = JSON.parse(event.target.result);
           if(data.language) setLanguage(data.language);
-          
           setTimeout(() => {
             if(data.headerFont) setHeaderFont(data.headerFont);
             if(data.bodyFont) setBodyFont(data.bodyFont);
           }, 50);
-          
           if(data.paperSize) setPaperSize(data.paperSize);
           if(data.orientation) setOrientation(data.orientation);
           if(data.layoutStyle) setLayoutStyle(data.layoutStyle);
@@ -133,7 +128,6 @@ export default function App() {
           if(data.headerLineSpacing) setHeaderLineSpacing(data.headerLineSpacing);
           if(data.showWatermark !== undefined) setShowWatermark(data.showWatermark);
           if(data.watermarkText !== undefined) setWatermarkText(data.watermarkText);
-          
           if(data.schoolName !== undefined) setSchoolName(data.schoolName);
           if(data.schoolAddress !== undefined) setSchoolAddress(data.schoolAddress);
           if(data.examTitle !== undefined) setExamTitle(data.examTitle);
@@ -141,7 +135,6 @@ export default function App() {
           if(data.subject !== undefined) setSubject(data.subject);
           if(data.totalMarks !== undefined) setTotalMarks(data.totalMarks);
           if(data.examTime !== undefined) setExamTime(data.examTime);
-          
           if(data.text !== undefined) setText(data.text);
           if(data.logo) setLogo(data.logo);
           if(data.showFooter !== undefined) setShowFooter(data.showFooter);
@@ -158,6 +151,12 @@ export default function App() {
     window.print();
   };
 
+  // MAGIC PARSER: Automatically aligns marks perfectly to the edge if user typed 3+ spaces before them
+  const formatHTML = (htmlContent) => {
+    const alignStyle = isRTL ? 'float: left;' : 'float: right;';
+    return htmlContent.replace(/(?:&nbsp;|\s){3,}([^<>]+?)\s*(<\/strong>)?\s*<\/p>/g, `<span style="${alignStyle}">$1</span>$2</p>`);
+  };
+
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, false] }],
@@ -171,12 +170,25 @@ export default function App() {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0a0f] to-black font-sans overflow-hidden print:bg-none print:bg-white print:block print:h-auto print:overflow-visible">
       
+      {/* Print Styles & Anti-Split System */}
       <style>
-        {`@media print {
+        {`
+          @media print {
             @page {
               size: ${paperSize === 'A4' ? 'A4' : paperSize === 'Letter' ? 'letter' : 'legal'} ${orientation};
               margin: 0;
             }
+          }
+          /* Magic CSS to keep questions and options together */
+          .exam-content p {
+              break-after: avoid;
+              page-break-after: avoid;
+          }
+          .exam-content ol, .exam-content ul {
+              break-before: avoid;
+              page-break-before: avoid;
+              break-inside: avoid;
+              margin-top: 0;
           }
         `}
       </style>
@@ -285,7 +297,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* ENHANCED Header Details */}
+        {/* Header Details */}
         <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/10 shrink-0">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-white flex items-center gap-2"><Building2 size={16} className="text-blue-400"/> Header Details</h2>
@@ -390,9 +402,7 @@ export default function App() {
 
           <div className="relative z-10 w-full max-w-full" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
-            {/* ========================================= */}
             {/* FULL-WIDTH HEADER (ONLY for English) */}
-            {/* ========================================= */}
             {language === 'English' && (
               <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                 {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
@@ -407,10 +417,7 @@ export default function App() {
                 
                 {examTitle && (
                   <div style={{ marginBottom: `${headerLineSpacing * 6}px`, marginTop: `${headerLineSpacing * 2}px` }}>
-                    <span 
-                      className="inline-block border-[2.5px] border-black px-6 py-1.5 font-bold rounded-lg" 
-                      style={{ fontSize: `${fontSize * 1.15}px` }}
-                    >
+                    <span className="inline-block border-[2.5px] border-black px-6 py-1.5 font-bold rounded-lg" style={{ fontSize: `${fontSize * 1.15}px` }}>
                       {examTitle}
                     </span>
                   </div>
@@ -428,11 +435,9 @@ export default function App() {
               </div>
             )}
 
-            {/* ========================================= */}
             {/* MAIN CONTENT & IN-COLUMN HEADER (For Bangla & Arabic) */}
-            {/* ========================================= */}
             <div 
-              className="w-full max-w-full whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
+              className="w-full max-w-full whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1 exam-content"
               style={{ 
                 fontFamily: bodyFont,
                 fontSize: `${fontSize}px`,
@@ -442,7 +447,9 @@ export default function App() {
                 columnGap: '60px',
                 wordBreak: 'keep-all',
                 overflowWrap: 'normal',
-                hyphens: 'none'
+                hyphens: 'none',
+                // MAGIC CENTER LINE (Folds perfectly in the middle)
+                columnRule: layoutStyle === 'mcq' ? '1.5px dashed rgba(0,0,0,0.3)' : 'none'
               }}
             >
               
@@ -450,7 +457,6 @@ export default function App() {
               {(language === 'Arabic' || language === 'Bangla') && (
                 <div className="relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                   
-                  {/* Magic Trick: isRTL=true means right-0 (Arabic), isRTL=false means left-0 (Bangla) */}
                   {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-20 h-20 object-contain`} />}
                   
                   {schoolName && (
@@ -464,14 +470,10 @@ export default function App() {
                   )}
 
                   {classLevel && (
-                    <div className="font-bold mt-1" style={{ fontSize: `${fontSize}px` }}>
-                      {classLevel}
-                    </div>
+                    <div className="font-bold mt-1" style={{ fontSize: `${fontSize}px` }}>{classLevel}</div>
                   )}
                   {subject && (
-                    <div className="font-bold" style={{ fontSize: `${fontSize}px` }}>
-                      {subject}
-                    </div>
+                    <div className="font-bold" style={{ fontSize: `${fontSize}px` }}>{subject}</div>
                   )}
                   
                   <div className="w-full flex justify-between items-center font-bold mt-3" style={{ fontSize: `${fontSize * 0.9}px` }}>
@@ -481,8 +483,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Text Editor Content */}
-              <div dangerouslySetInnerHTML={{ __html: text }} />
+              {/* Text Editor Content with Auto-Aligned Marks */}
+              <div dangerouslySetInnerHTML={{ __html: formatHTML(text) }} />
             </div>
 
           </div>
