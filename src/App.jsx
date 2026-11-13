@@ -82,6 +82,8 @@ export default function App() {
     let h = '297mm';
     if (paperSize === 'Letter') { w = '215.9mm'; h = '279.4mm'; }
     if (paperSize === 'Legal') { w = '215.9mm'; h = '355.6mm'; }
+    
+    // For live preview scaling
     if (orientation === 'landscape') return { width: h, minHeight: w };
     return { width: w, minHeight: h };
   };
@@ -150,7 +152,6 @@ export default function App() {
     window.print();
   };
 
-  // MAGIC PARSER: Automatically aligns marks perfectly to the edge if user typed 3+ spaces before them
   const formatHTML = (htmlContent) => {
     const alignStyle = isRTL ? 'float: left;' : 'float: right;';
     return htmlContent.replace(/(?:&nbsp;|\s){3,}([^<>]+?)\s*(<\/strong>)?\s*<\/p>/g, `<span style="${alignStyle}">$1</span>$2</p>`);
@@ -169,7 +170,6 @@ export default function App() {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0a0f] to-black font-sans overflow-hidden print:bg-none print:bg-white print:block print:h-auto print:overflow-visible">
       
-      {/* MAGICAL FIX: Adjusted Anti-Split System to allow proper column filling */}
       <style>
         {`
           @media print {
@@ -178,7 +178,6 @@ export default function App() {
               margin: 0;
             }
           }
-          /* Anti-Split CSS: Keeps lists and items together without forcing columns to jump empty */
           .exam-content ol, .exam-content ul {
               break-inside: avoid;
               page-break-inside: avoid;
@@ -187,12 +186,6 @@ export default function App() {
           .exam-content li {
               break-inside: avoid;
               page-break-inside: avoid;
-          }
-          .exam-header {
-              break-inside: avoid;
-              page-break-inside: avoid;
-              break-after: avoid;
-              page-break-after: avoid;
           }
         `}
       </style>
@@ -408,7 +401,7 @@ export default function App() {
             
             {/* FULL-WIDTH HEADER (ONLY for English) */}
             {language === 'English' && (
-              <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center exam-header" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
+              <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                 {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
                 
                 {schoolName && (
@@ -440,6 +433,7 @@ export default function App() {
             )}
 
             {/* MAIN CONTENT & IN-COLUMN HEADER (For Bangla & Arabic) */}
+            {/* MAGIC FIX: `columnFill: 'balance'` dynamically divides content equally between live view & print */}
             <div 
               className="w-full max-w-full whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1 exam-content"
               style={{ 
@@ -449,7 +443,7 @@ export default function App() {
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
                 columnGap: '60px',
-                columnFill: 'auto', /* MAGIC FIX: Forces browser to fill the left column completely before going to right */
+                columnFill: 'balance', 
                 wordBreak: 'keep-all',
                 overflowWrap: 'normal',
                 hyphens: 'none',
@@ -459,7 +453,7 @@ export default function App() {
               
               {/* BOOKLET STYLE HEADER (Renders inside the 1st Column) */}
               {(language === 'Arabic' || language === 'Bangla') && (
-                <div className="exam-header relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
+                <div className="relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                   
                   {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-20 h-20 object-contain`} />}
                   
@@ -491,7 +485,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* Text Editor Content with Auto-Aligned Marks */}
+              {/* Text Editor Content */}
               <div dangerouslySetInnerHTML={{ __html: formatHTML(text) }} />
             </div>
 
