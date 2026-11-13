@@ -34,10 +34,10 @@ export default function App() {
   const [bodyFont, setBodyFont] = useState("'Tiro Bangla', serif");
 
   const [paperSize, setPaperSize] = useState('A4');
-  const [orientation, setOrientation] = useState('portrait'); 
-  const [layoutStyle, setLayoutStyle] = useState('standard');
+  const [orientation, setOrientation] = useState('landscape'); // Changed default to landscape for booklet
+  const [layoutStyle, setLayoutStyle] = useState('mcq'); // Changed default to 2 columns
   
-  const [fontSize, setFontSize] = useState(18);
+  const [fontSize, setFontSize] = useState(16); // Changed default to 16px for booklet fitting
   const [lineSpacing, setLineSpacing] = useState(1.6);
   const [headerLineSpacing, setHeaderLineSpacing] = useState(1.2); 
 
@@ -391,9 +391,9 @@ export default function App() {
           <div className="relative z-10 w-full max-w-full" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
             {/* ========================================= */}
-            {/* FULL-WIDTH HEADER (For Bangla & English) */}
+            {/* FULL-WIDTH HEADER (ONLY for English) */}
             {/* ========================================= */}
-            {language !== 'Arabic' && (
+            {language === 'English' && (
               <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                 {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
                 
@@ -429,7 +429,7 @@ export default function App() {
             )}
 
             {/* ========================================= */}
-            {/* MAIN CONTENT & IN-COLUMN HEADER (For Arabic) */}
+            {/* MAIN CONTENT & IN-COLUMN HEADER (For Bangla & Arabic) */}
             {/* ========================================= */}
             <div 
               className="w-full max-w-full whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1"
@@ -440,18 +440,18 @@ export default function App() {
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
                 columnGap: '60px',
-                
-                /* MAGIC FIX 100% BULLETPROOF: Force Arabic words to stay whole and prevent cutting at edges */
                 wordBreak: 'keep-all',
                 overflowWrap: 'normal',
                 hyphens: 'none'
               }}
             >
               
-              {/* BOOKLET STYLE HEADER (Renders inside the 1st Column only for Arabic) */}
-              {language === 'Arabic' && (
+              {/* BOOKLET STYLE HEADER (Renders inside the 1st Column) */}
+              {(language === 'Arabic' || language === 'Bangla') && (
                 <div className="relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
-                  {logo && <img src={logo} alt="Logo" className={`absolute top-0 right-0 w-20 h-20 object-contain`} />}
+                  
+                  {/* Magic Trick: isRTL=true means right-0 (Arabic), isRTL=false means left-0 (Bangla) */}
+                  {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-20 h-20 object-contain`} />}
                   
                   {schoolName && (
                     <h1 className="font-bold leading-tight" style={{ fontSize: `${fontSize * 1.5}px`, padding: logo ? '0 90px' : '0', marginBottom: `${headerLineSpacing * 2}px` }}>{schoolName}</h1>
@@ -475,8 +475,8 @@ export default function App() {
                   )}
                   
                   <div className="w-full flex justify-between items-center font-bold mt-3" style={{ fontSize: `${fontSize * 0.9}px` }}>
-                    <span>{totalMarks}</span>
                     <span>{examTime}</span>
+                    <span>{totalMarks}</span>
                   </div>
                 </div>
               )}
