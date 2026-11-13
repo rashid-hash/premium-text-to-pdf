@@ -60,7 +60,6 @@ export default function App() {
   const [totalMarks, setTotalMarks] = useState('পূর্ণমান: ১০০');
   const [examTime, setExamTime] = useState('সময়: ২.৩০ মি:');
 
-  // Default Template configured perfectly for Booklets
   const [text, setText] = useState(`<p><strong>১। এক কথায় উত্তর দাও (যেকোনো ১০ টি)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;১০</strong></p><ol style="list-style-type: lower-alpha;"><li>সর্বোত্তম নফল ইবাদাত কোনটি?</li><li>কুরআন তিলাওয়াতকারীর সাথে কিয়ামাতে কুরআন কেমন আচরণ করবে?</li><li>কুরআন মাজিদের আয়াত সংখ্যা কতটি?</li><li>কুরআন মাজিদের সবচেয়ে বড় আয়াত কোনটি?</li><li>কুরআন মাজিদের প্রথম নাজিলকৃত আয়াত কোনটি?</li></ol>`);
 
   const isRTL = language === 'Arabic';
@@ -170,7 +169,7 @@ export default function App() {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-[#0a0a0f] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0a0a0f] to-black font-sans overflow-hidden print:bg-none print:bg-white print:block print:h-auto print:overflow-visible">
       
-      {/* Print Styles & Anti-Split System */}
+      {/* MAGICAL FIX: Adjusted Anti-Split System to allow proper column filling */}
       <style>
         {`
           @media print {
@@ -179,16 +178,21 @@ export default function App() {
               margin: 0;
             }
           }
-          /* Magic CSS to keep questions and options together */
-          .exam-content p {
+          /* Anti-Split CSS: Keeps lists and items together without forcing columns to jump empty */
+          .exam-content ol, .exam-content ul {
+              break-inside: avoid;
+              page-break-inside: avoid;
+              margin-top: 0;
+          }
+          .exam-content li {
+              break-inside: avoid;
+              page-break-inside: avoid;
+          }
+          .exam-header {
+              break-inside: avoid;
+              page-break-inside: avoid;
               break-after: avoid;
               page-break-after: avoid;
-          }
-          .exam-content ol, .exam-content ul {
-              break-before: avoid;
-              page-break-before: avoid;
-              break-inside: avoid;
-              margin-top: 0;
           }
         `}
       </style>
@@ -404,7 +408,7 @@ export default function App() {
             
             {/* FULL-WIDTH HEADER (ONLY for English) */}
             {language === 'English' && (
-              <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
+              <div className="relative text-center border-b-[3px] border-black pb-4 mb-6 flex flex-col items-center exam-header" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                 {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-24 h-24 object-contain`} />}
                 
                 {schoolName && (
@@ -445,17 +449,17 @@ export default function App() {
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
                 columnGap: '60px',
+                columnFill: 'auto', /* MAGIC FIX: Forces browser to fill the left column completely before going to right */
                 wordBreak: 'keep-all',
                 overflowWrap: 'normal',
                 hyphens: 'none',
-                // MAGIC CENTER LINE (Folds perfectly in the middle)
                 columnRule: layoutStyle === 'mcq' ? '1.5px dashed rgba(0,0,0,0.3)' : 'none'
               }}
             >
               
               {/* BOOKLET STYLE HEADER (Renders inside the 1st Column) */}
               {(language === 'Arabic' || language === 'Bangla') && (
-                <div className="relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
+                <div className="exam-header relative text-center border-b-[2px] border-black pb-3 mb-4 flex flex-col items-center break-inside-avoid" style={{ fontFamily: headerFont, lineHeight: headerLineSpacing }}>
                   
                   {logo && <img src={logo} alt="Logo" className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-20 h-20 object-contain`} />}
                   
@@ -470,10 +474,14 @@ export default function App() {
                   )}
 
                   {classLevel && (
-                    <div className="font-bold mt-1" style={{ fontSize: `${fontSize}px` }}>{classLevel}</div>
+                    <div className="font-bold mt-1" style={{ fontSize: `${fontSize}px` }}>
+                      {classLevel}
+                    </div>
                   )}
                   {subject && (
-                    <div className="font-bold" style={{ fontSize: `${fontSize}px` }}>{subject}</div>
+                    <div className="font-bold" style={{ fontSize: `${fontSize}px` }}>
+                      {subject}
+                    </div>
                   )}
                   
                   <div className="w-full flex justify-between items-center font-bold mt-3" style={{ fontSize: `${fontSize * 0.9}px` }}>
