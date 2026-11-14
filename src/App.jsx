@@ -78,14 +78,16 @@ export default function App() {
   }, [language]);
 
   const getPaperDimensions = () => {
-    let w = '210mm';
-    let h = '297mm';
-    if (paperSize === 'Letter') { w = '215.9mm'; h = '279.4mm'; }
-    if (paperSize === 'Legal') { w = '215.9mm'; h = '355.6mm'; }
+    let w = 210;
+    let h = 297;
+    if (paperSize === 'Letter') { w = 215.9; h = 279.4; }
+    if (paperSize === 'Legal') { w = 215.9; h = 355.6; }
     
-    // For live preview scaling
-    if (orientation === 'landscape') return { width: h, minHeight: w };
-    return { width: w, minHeight: h };
+    // Returns exact dimensions for the paper wrapper
+    if (orientation === 'landscape') {
+      return { width: `${h}mm`, height: `${w}mm` };
+    }
+    return { width: `${w}mm`, height: `${h}mm` };
   };
 
   const handleLogoUpload = (e) => {
@@ -186,6 +188,11 @@ export default function App() {
           .exam-content li {
               break-inside: avoid;
               page-break-inside: avoid;
+          }
+          /* MAGICAL FIX 2: Allows empty <p><br></p> tags to show vertical space */
+          .exam-content p {
+              min-height: 1em; 
+              margin-bottom: 0.25rem;
           }
         `}
       </style>
@@ -381,7 +388,7 @@ export default function App() {
       {/* Live Preview Workspace */}
       <div className="flex-1 flex items-start justify-center p-4 lg:p-8 overflow-auto print:p-0 print:block print:overflow-visible">
         <div 
-          className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all duration-300 relative overflow-hidden print:shadow-none print:w-full print:min-h-0 print:m-0"
+          className="bg-white shadow-[0_20px_60px_rgba(0,0,0,0.4)] transition-all duration-300 relative overflow-hidden print:shadow-none print:w-full print:m-0"
           style={{ 
             ...getPaperDimensions(), 
             boxSizing: 'border-box',
@@ -397,7 +404,7 @@ export default function App() {
             </div>
           )}
 
-          <div className="relative z-10 w-full max-w-full" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
+          <div className="relative z-10 w-full h-full flex flex-col" dir={isRTL ? "rtl" : "ltr"} style={{ color: 'black' }}>
             
             {/* FULL-WIDTH HEADER (ONLY for English) */}
             {language === 'English' && (
@@ -432,10 +439,10 @@ export default function App() {
               </div>
             )}
 
-            {/* MAIN CONTENT & IN-COLUMN HEADER (For Bangla & Arabic) */}
-            {/* MAGIC FIX: `columnFill: 'balance'` dynamically divides content equally between live view & print */}
+            {/* MAIN CONTENT AREA */}
+            {/* MAGICAL FIX 1: Set fixed height 100% and auto column fill so it forces left column to fill up first! */}
             <div 
-              className="w-full max-w-full whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 [&>p]:mb-1 exam-content"
+              className="w-full h-full flex-1 whitespace-pre-wrap [&>ul]:list-disc [&>ul]:mx-6 [&>ol]:list-decimal [&>ol]:mx-6 exam-content"
               style={{ 
                 fontFamily: bodyFont,
                 fontSize: `${fontSize}px`,
@@ -443,7 +450,7 @@ export default function App() {
                 textAlign: 'justify',
                 columnCount: layoutStyle === 'mcq' ? 2 : 1,
                 columnGap: '60px',
-                columnFill: 'balance', 
+                columnFill: 'auto', /* FORCES LEFT COLUMN FIRST */
                 wordBreak: 'keep-all',
                 overflowWrap: 'normal',
                 hyphens: 'none',
